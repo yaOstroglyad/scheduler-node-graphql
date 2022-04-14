@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_USERNAME": "andrey",
+    "MONGO_PASSWORD": "tcp50XdbdUdCirEM",
+    "MONGO_DB_NAME": "scheduler"
+  }
+}

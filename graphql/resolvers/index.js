@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const Event = require('../../models/event');
 const User = require('../../models/user');
 
-const events = async eventIds => {
+const getEventsByIds = async eventIds => {
     try {
         const events = await Event.find({ _id: { $in: eventIds } });
         events.map(event => {
@@ -11,7 +11,7 @@ const events = async eventIds => {
                 ...event._doc,
                 _id: event.id,
                 date: new Date(event._doc.date).toISOString(),
-                owner: user.bind(this, event.owner)
+                owner: getUserById.bind(this, event.owner)
             };
         });
         return events;
@@ -20,13 +20,14 @@ const events = async eventIds => {
     }
 };
 
-const user = async userId => {
+const getUserById = async userId => {
     try {
         const user = await User.findById(userId);
         return {
             ...user._doc,
             _id: user.id,
-            createdEvents: events.bind(this, user._doc.createdEvents)
+            createdDate: new Date(user._doc.createdDate).toISOString(),
+            createdEvents: getEventsByIds.bind(this, user._doc.createdEvents)
         };
     } catch (err) {
         throw err;
@@ -42,7 +43,22 @@ module.exports = {
                     ...event._doc,
                     _id: event.id,
                     date: new Date(event._doc.date).toISOString(),
-                    owner: user.bind(this, event._doc.owner)
+                    owner: getUserById.bind(this, event._doc.owner)
+                };
+            });
+        } catch (err) {
+            throw err;
+        }
+    },
+    users: async () => {
+        try {
+            const users = await User.find();
+            return users.map(user => {
+                return {
+                    ...user._doc,
+                    _id: user.id,
+                    createdDate: new Date(user._doc.createdDate).toISOString(),
+                    createdEvents: getEventsByIds.bind(this, user._doc.createdEvents)
                 };
             });
         } catch (err) {
@@ -64,7 +80,7 @@ module.exports = {
                 ...result._doc,
                 _id: result._doc._id.toString(),
                 date: new Date(event._doc.date).toISOString(),
-                owner: user.bind(this, result._doc.owner)
+                owner: getUserById.bind(this, result._doc.owner)
             };
             const owner = await User.findById(result._doc.owner);
 

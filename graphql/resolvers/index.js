@@ -50,21 +50,6 @@ module.exports = {
             throw err;
         }
     },
-    users: async () => {
-        try {
-            const users = await User.find();
-            return users.map(user => {
-                return {
-                    ...user._doc,
-                    _id: user.id,
-                    createdDate: new Date(user._doc.createdDate).toISOString(),
-                    createdEvents: getEventsByIds.bind(this, user._doc.createdEvents)
-                };
-            });
-        } catch (err) {
-            throw err;
-        }
-    },
     createEvent: async args => {
         const event = new Event({
             title: args.event.title,
@@ -93,6 +78,21 @@ module.exports = {
             return createdEvent;
         } catch (err) {
             console.log(err);
+            throw err;
+        }
+    },
+    users: async () => {
+        try {
+            const users = await User.find();
+            return users.map(user => {
+                return {
+                    ...user._doc,
+                    _id: user.id,
+                    createdDate: new Date(user._doc.createdDate).toISOString(),
+                    createdEvents: getEventsByIds.bind(this, user._doc.createdEvents)
+                };
+            });
+        } catch (err) {
             throw err;
         }
     },

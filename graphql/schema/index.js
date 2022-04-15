@@ -24,7 +24,6 @@ module.exports = buildSchema(`
         description: String!
         price: Float!
         date: String!
-        ownerId: String!
     }
     
     type User {

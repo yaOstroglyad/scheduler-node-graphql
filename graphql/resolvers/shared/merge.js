@@ -24,8 +24,8 @@ const transformBooking = booking => {
     return {
         ...booking._doc,
         _id: booking.id,
-        event: getEventById.bind(this, booking._doc.event),
         user: getUserById.bind(this, booking._doc.user),
+        event: getEventById.bind(this, booking._doc.event),
         createdAt: dateToString(booking._doc.createdAt),
         updatedAt: dateToString(booking._doc.updatedAt)
     }
@@ -34,8 +34,11 @@ const transformBooking = booking => {
 const getEventsByIds = async eventIds => {
     try {
         const events = await Event.find({_id: {$in: eventIds}});
+        events.sort((a, b) => {
+            return (eventIds.indexOf(a.id.toString()) - eventIds.indexOf(b._id.toString()));
+        });
         return events.map(event => {
-            return transformEvent(event)
+            return transformEvent(event);
         });
     } catch (err) {
         throw err;

@@ -2,6 +2,7 @@ const Booking = require("../../models/booking");
 const Event = require("../../models/event");
 const User = require("../../models/user");
 const {transformEvent, transformBooking} = require("./shared/merge");
+const DataLoader = require("dataloader");
 
 module.exports = {
     bookings: async (args, req) => {
@@ -17,12 +18,15 @@ module.exports = {
             throw err;
         }
     },
-    bookEvent: async args => {
+    bookEvent: async (args, req) => {
+        if(!req.isAuth) {
+            throw new Error('Unauthenticated!');
+        }
         try {
             const fetchedEvent = await Event.findOne({_id: args.eventId})
-            const fetchedUser = await User.findOne({_id: args.userId})
             const booking = new Booking({
-                user: fetchedUser, event: fetchedEvent
+                user: req.userId,
+                event: fetchedEvent
             });
             const result = await booking.save();
             return transformBooking(result);
